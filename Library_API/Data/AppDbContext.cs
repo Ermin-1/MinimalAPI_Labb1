@@ -16,7 +16,6 @@ namespace Library_API.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Book>().HasData( new Book()
-            new Book()
             {
                 Id = 101,
                 Title = "The Phantom Abyss",
