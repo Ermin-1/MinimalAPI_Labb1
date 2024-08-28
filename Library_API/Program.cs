@@ -1,10 +1,13 @@
 
+using AutoMapper;
 using FluentValidation;
 using Library_API.Data;
 using Library_API.Models;
+using Library_API.Models.DTOs;
 using Library_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace Library_API
 {
@@ -24,6 +27,9 @@ namespace Library_API
             //registrera automapper och validations
             builder.Services.AddAutoMapper(typeof(MappingConfig));
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+            //Registrera Interface
+            builder.Services.AddScoped<IBookRepository, BookRepository>();
 
             //registrera db
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -45,8 +51,46 @@ namespace Library_API
 
 
             //Get all books
-            app.MapGet("/api/book", async ([FromServices] IBookRepository _bookRepo) =>
+            app.MapGet("/api/book", async ([FromServices] IBookRepository _bookRepository) =>
+            {
+                var books = await _bookRepository.GetAllBooks();
 
+                APIResponse respone = new APIResponse
+                {
+                    IsSuccess = true,
+                    Result = books,
+                    Statuscode = System.Net.HttpStatusCode.OK
+                };
+
+                return Results.Ok(respone);
+            }).WithName("GetAllBooks").Produces<APIResponse>(200);
+
+            //Get by ID
+            app.MapGet("/api/book/{id:int}", async (int id, [FromServices] IBookRepository _bookRepository, [FromServices] IMapper _mapper) =>
+            {
+                var singleBook = await _bookRepository.GetById(id);
+
+                if (singleBook != null)
+                {
+                    APIResponse response = new APIResponse
+                    {
+                        Result = _mapper.Map<BookDTO>(singleBook),  // Användning av AutoMapper
+                        IsSuccess = true,
+                        Statuscode = System.Net.HttpStatusCode.OK
+                    };
+
+                    return Results.Ok(response);
+                }
+
+                APIResponse notFoundResponse = new APIResponse
+                {
+                    IsSuccess = false,
+                    Statuscode = System.Net.HttpStatusCode.NotFound,
+                    ErrorMessages = new List<string> { "Book not found" }
+                };
+
+                return Results.NotFound(notFoundResponse);
+            }).WithName("GetBookById").Produces<APIResponse>(200).Produces<APIResponse>(404);
 
 
 
