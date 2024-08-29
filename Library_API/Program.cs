@@ -50,47 +50,59 @@ namespace Library_API
             app.UseAuthorization();
 
 
-            //Get all books
-            app.MapGet("/api/book", async ([FromServices] IBookRepository _bookRepository) =>
+            app.MapGet("/api/books", () =>
             {
-                var books = await _bookRepository.GetAllBooks();
+                APIResponse response = new APIResponse();
 
-                APIResponse respone = new APIResponse
-                {
-                    IsSuccess = true,
-                    Result = books,
-                    Statuscode = System.Net.HttpStatusCode.OK
-                };
+                response.Result = BookShelf.bookList;
+                response.IsSuccess = true;
+                response.Statuscode = System.Net.HttpStatusCode.OK;
 
-                return Results.Ok(respone);
-            }).WithName("GetAllBooks").Produces<APIResponse>(200);
+                return Results.Ok(response);
 
-            //Get by ID
-            app.MapGet("/api/book/{id:int}", async (int id, [FromServices] IBookRepository _bookRepository, [FromServices] IMapper _mapper) =>
-            {
-                var singleBook = await _bookRepository.GetById(id);
+            }).WithName("GetBooks").Produces(200);
 
-                if (singleBook != null)
-                {
-                    APIResponse response = new APIResponse
-                    {
-                        Result = _mapper.Map<BookDTO>(singleBook),  // Användning av AutoMapper
-                        IsSuccess = true,
-                        Statuscode = System.Net.HttpStatusCode.OK
-                    };
+            ////Get all books
+            //app.MapGet("/api/book", async ([FromServices] IBookRepository _bookRepository) =>
+            //{
+            //    var books = await _bookRepository.GetAllAsync();
 
-                    return Results.Ok(response);
-                }
+            //    APIResponse respone = new APIResponse
+            //    {
+            //        IsSuccess = true,
+            //        Result = books,
+            //        Statuscode = System.Net.HttpStatusCode.OK
+            //    };
 
-                APIResponse notFoundResponse = new APIResponse
-                {
-                    IsSuccess = false,
-                    Statuscode = System.Net.HttpStatusCode.NotFound,
-                    ErrorMessages = new List<string> { "Book not found" }
-                };
+            //    return Results.Ok(respone);
+            //}).WithName("GetAllBooks").Produces<APIResponse>(200);
 
-                return Results.NotFound(notFoundResponse);
-            }).WithName("GetBookById").Produces<APIResponse>(200).Produces<APIResponse>(404);
+            ////Get by ID
+            //app.MapGet("/api/book/{id:int}", async (int id, [FromServices] IBookRepository _bookRepository, [FromServices] IMapper _mapper) =>
+            //{
+            //    var singleBook = await _bookRepository.GetAsync(id);
+
+            //    if (singleBook != null)
+            //    {
+            //        APIResponse response = new APIResponse
+            //        {
+            //            Result = _mapper.Map<BookDTO>(singleBook),  // Användning av AutoMapper
+            //            IsSuccess = true,
+            //            Statuscode = System.Net.HttpStatusCode.OK
+            //        };
+
+            //        return Results.Ok(response);
+            //    }
+
+            //    APIResponse notFoundResponse = new APIResponse
+            //    {
+            //        IsSuccess = false,
+            //        Statuscode = System.Net.HttpStatusCode.NotFound,
+            //        ErrorMessages = new List<string> { "Book not found" }
+            //    };
+
+            //    return Results.NotFound(notFoundResponse);
+            //}).WithName("GetBookById").Produces<APIResponse>(200).Produces<APIResponse>(404);
 
 
 
