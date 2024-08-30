@@ -1,13 +1,16 @@
 
 using AutoMapper;
+using Azure;
 using FluentValidation;
 using Library_API.Data;
+using Library_API.EndPoint;
 using Library_API.Models;
 using Library_API.Models.DTOs;
 using Library_API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
+using static Azure.Core.HttpHeader;
 
 namespace Library_API
 {
@@ -49,7 +52,7 @@ namespace Library_API
 
             app.UseAuthorization();
 
-
+            //Get all books
             app.MapGet("/api/books", () =>
             {
                 APIResponse response = new APIResponse();
@@ -62,51 +65,103 @@ namespace Library_API
 
             }).WithName("GetBooks").Produces(200);
 
-            ////Get all books
-            //app.MapGet("/api/book", async ([FromServices] IBookRepository _bookRepository) =>
-            //{
-            //    var books = await _bookRepository.GetAllAsync();
 
-            //    APIResponse respone = new APIResponse
-            //    {
-            //        IsSuccess = true,
-            //        Result = books,
-            //        Statuscode = System.Net.HttpStatusCode.OK
-            //    };
+            //Get book by Id
+            app.MapGet("/api/book/{id:int}", (int id) =>
+            {
+                APIResponse response = new APIResponse();
 
-            //    return Results.Ok(respone);
-            //}).WithName("GetAllBooks").Produces<APIResponse>(200);
+                response.Result = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
+                response.IsSuccess = true;
+                response.Statuscode = System.Net.HttpStatusCode.OK;
 
-            ////Get by ID
-            //app.MapGet("/api/book/{id:int}", async (int id, [FromServices] IBookRepository _bookRepository, [FromServices] IMapper _mapper) =>
-            //{
-            //    var singleBook = await _bookRepository.GetAsync(id);
-
-            //    if (singleBook != null)
-            //    {
-            //        APIResponse response = new APIResponse
-            //        {
-            //            Result = _mapper.Map<BookDTO>(singleBook),  // Användning av AutoMapper
-            //            IsSuccess = true,
-            //            Statuscode = System.Net.HttpStatusCode.OK
-            //        };
-
-            //        return Results.Ok(response);
-            //    }
-
-            //    APIResponse notFoundResponse = new APIResponse
-            //    {
-            //        IsSuccess = false,
-            //        Statuscode = System.Net.HttpStatusCode.NotFound,
-            //        ErrorMessages = new List<string> { "Book not found" }
-            //    };
-
-            //    return Results.NotFound(notFoundResponse);
-            //}).WithName("GetBookById").Produces<APIResponse>(200).Produces<APIResponse>(404);
+                return Results.Ok(response);
+            }).WithName("GetCoupon").Produces(200);
 
 
+            //Post books
+			app.MapPost("/api/book", async (
+			  CreateBookDTO bookDTO,
+			  IMapper _mapper,
+			  IValidator<CreateBookDTO> validator) =>
+            {
+                APIResponse response = new APIResponse { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
 
-            app.Run();
+                var validatorResult = await validator.ValidateAsync(bookDTO);
+
+                if (!validatorResult.IsValid)
+                {
+                    return Results.BadRequest(response);
+                }
+                if (BookShelf.bookList.FirstOrDefault(b => b.Title.ToLower() == bookDTO.Title.ToLower()) != null)
+                {
+                    response.ErrorMessages.Add("Coupon name already exists.");
+                    return Results.BadRequest(response);
+                }
+
+                Book bookA = _mapper.Map<Book>(bookDTO);
+                bookA.Id = BookShelf.bookList.OrderByDescending(b => b.Id).FirstOrDefault().Id + 1;
+                BookShelf.bookList.Add(bookA);
+
+                BookDTO bookDto = _mapper.Map<BookDTO>(bookA);
+
+                response.Result = bookDto;
+                response.IsSuccess = true;
+                response.Statuscode = System.Net.HttpStatusCode.Created;
+
+                return Results.Ok(response);
+                }).WithName("CreateBook").Produces<CreateBookDTO>(201).Accepts<APIResponse>("application/json").Produces(400);
+
+            //Update book
+            app.MapPut("/api/book", async (IMapper _mapper, IValidator<UpdateBookDTO> _validator, UpdateBookDTO book_U_DTO) =>
+
+            {
+				APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
+
+                //add validation
+                var validateResult = await _validator.ValidateAsync(book_U_DTO);
+                if(!validateResult.IsValid)
+                {
+					response.ErrorMessages.Add(validateResult.Errors.FirstOrDefault().ToString());
+				}
+
+                Book bookShelf = BookShelf.bookList.FirstOrDefault(b => b.Id == book_U_DTO.Id);
+                bookShelf.IsAvalible = book_U_DTO.IsAvalible;
+                bookShelf.Title = book_U_DTO.Title;
+                bookShelf.Author = book_U_DTO.Author;
+                bookShelf.Description = book_U_DTO.Description;
+                bookShelf.Genre = book_U_DTO.Genre;
+
+                //AUTOMAPPER
+
+                Book book = _mapper.Map<Book>(book_U_DTO);
+                response.Result = _mapper.Map<BookDTO>(bookShelf);
+                response.IsSuccess = true;
+                response.Statuscode = System.Net.HttpStatusCode.OK;
+			}).WithName("UpdateBook").Accepts<UpdateBookDTO>("application/json").Produces<UpdateBookDTO>(400);
+
+			app.MapDelete("/api/coupon/{id:int}", (int id) =>
+			{
+				APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
+
+				Book bookShelf = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
+
+				if (bookShelf != null)
+				{
+					BookShelf.bookList.Remove(bookShelf);
+					response.IsSuccess = true;
+					response.Statuscode = System.Net.HttpStatusCode.NoContent;
+					return Results.Ok(response);
+				}
+				else
+				{
+					response.ErrorMessages.Add("Invalid ID");
+					return Results.BadRequest(response);
+				}
+			}).WithName("DeleteCoupon");
+
+		    app.ConfigurationCouponEndPoints();
+			app.Run();
         }
     }
 }
