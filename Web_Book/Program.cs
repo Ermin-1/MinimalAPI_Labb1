@@ -9,7 +9,11 @@ namespace Web_Book
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            var app = builder.Build();
+
+
+			StaticDetails.BookApiBase = builder.Configuration["ServiceUrls:ErminBookAPI"];
+
+			var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

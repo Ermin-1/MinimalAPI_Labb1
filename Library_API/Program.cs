@@ -76,7 +76,7 @@ namespace Library_API
                 response.Statuscode = System.Net.HttpStatusCode.OK;
 
                 return Results.Ok(response);
-            }).WithName("GetCoupon").Produces(200);
+            }).WithName("GetBook").Produces(200);
 
 
             //Post books
@@ -95,7 +95,7 @@ namespace Library_API
                 }
                 if (BookShelf.bookList.FirstOrDefault(b => b.Title.ToLower() == bookDTO.Title.ToLower()) != null)
                 {
-                    response.ErrorMessages.Add("Coupon name already exists.");
+                    response.ErrorMessages.Add("Book name already exists.");
                     return Results.BadRequest(response);
                 }
 
@@ -140,7 +140,7 @@ namespace Library_API
                 response.Statuscode = System.Net.HttpStatusCode.OK;
 			}).WithName("UpdateBook").Accepts<UpdateBookDTO>("application/json").Produces<UpdateBookDTO>(400);
 
-			app.MapDelete("/api/coupon/{id:int}", (int id) =>
+			app.MapDelete("/api/book/{id:int}", (int id) =>
 			{
 				APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
 
@@ -158,9 +158,9 @@ namespace Library_API
 					response.ErrorMessages.Add("Invalid ID");
 					return Results.BadRequest(response);
 				}
-			}).WithName("DeleteCoupon");
+			}).WithName("DeleteBook");
 
-		    app.ConfigurationCouponEndPoints();
+		    app.ConfigurationBookEndPoints();
 			app.Run();
         }
     }
