@@ -1,3 +1,5 @@
+using Web_Book.Services;
+
 namespace Web_Book
 {
     public class Program
@@ -8,8 +10,8 @@ namespace Web_Book
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
-
+            builder.Services.AddScoped<IBookService, BookService>();
+            builder.Services.AddHttpClient();
 
 			StaticDetails.BookApiBase = builder.Configuration["ServiceUrls:ErminBookAPI"];
 
