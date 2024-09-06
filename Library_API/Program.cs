@@ -22,8 +22,6 @@ namespace Library_API
 
             // Add services to the container.
             builder.Services.AddAuthorization();
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -52,65 +50,65 @@ namespace Library_API
 
             app.UseAuthorization();
 
-            //Get all books
-            app.MapGet("/api/books", () =>
-            {
-                APIResponse response = new APIResponse();
+            ////Get all books
+            //app.MapGet("/api/books", () =>
+            //{
+            //    APIResponse response = new APIResponse();
 
-                response.Result = BookShelf.bookList;
-                response.IsSuccess = true;
-                response.Statuscode = System.Net.HttpStatusCode.OK;
+            //    response.Result = BookShelf.bookList;
+            //    response.IsSuccess = true;
+            //    response.Statuscode = System.Net.HttpStatusCode.OK;
 
-                return Results.Ok(response);
+            //    return Results.Ok(response);
 
-            }).WithName("GetBooks").Produces(200);
-
-
-            //Get book by Id
-            app.MapGet("/api/book/{id:int}", (int id) =>
-            {
-                APIResponse response = new APIResponse();
-
-                response.Result = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
-                response.IsSuccess = true;
-                response.Statuscode = System.Net.HttpStatusCode.OK;
-
-                return Results.Ok(response);
-            }).WithName("GetBook").Produces(200);
+            //}).WithName("GetBooks").Produces(200);
 
 
-            //Post books
-			app.MapPost("/api/book", async (
-			  CreateBookDTO bookDTO,
-			  IMapper _mapper,
-			  IValidator<CreateBookDTO> validator) =>
-            {
-                APIResponse response = new APIResponse { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
+            ////Get book by Id
+            //app.MapGet("/api/book/{id:int}", (int id) =>
+            //{
+            //    APIResponse response = new APIResponse();
 
-                var validatorResult = await validator.ValidateAsync(bookDTO);
+            //    response.Result = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
+            //    response.IsSuccess = true;
+            //    response.Statuscode = System.Net.HttpStatusCode.OK;
 
-                if (!validatorResult.IsValid)
-                {
-                    return Results.BadRequest(response);
-                }
-                if (BookShelf.bookList.FirstOrDefault(b => b.Title.ToLower() == bookDTO.Title.ToLower()) != null)
-                {
-                    response.ErrorMessages.Add("Book name already exists.");
-                    return Results.BadRequest(response);
-                }
+            //    return Results.Ok(response);
+            //}).WithName("GetBook").Produces(200);
 
-                Book bookA = _mapper.Map<Book>(bookDTO);
-                bookA.Id = BookShelf.bookList.OrderByDescending(b => b.Id).FirstOrDefault().Id + 1;
-                BookShelf.bookList.Add(bookA);
 
-                BookDTO bookDto = _mapper.Map<BookDTO>(bookA);
+   //         //Post books
+			//app.MapPost("/api/book", async (
+			//  CreateBookDTO bookDTO,
+			//  IMapper _mapper,
+			//  IValidator<CreateBookDTO> validator) =>
+   //         {
+   //             APIResponse response = new APIResponse { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
 
-                response.Result = bookDto;
-                response.IsSuccess = true;
-                response.Statuscode = System.Net.HttpStatusCode.Created;
+   //             var validatorResult = await validator.ValidateAsync(bookDTO);
 
-                return Results.Ok(response);
-                }).WithName("CreateBook").Produces<CreateBookDTO>(201).Accepts<APIResponse>("application/json").Produces(400);
+   //             if (!validatorResult.IsValid)
+   //             {
+   //                 return Results.BadRequest(response);
+   //             }
+   //             if (BookShelf.bookList.FirstOrDefault(b => b.Title.ToLower() == bookDTO.Title.ToLower()) != null)
+   //             {
+   //                 response.ErrorMessages.Add("Book name already exists.");
+   //                 return Results.BadRequest(response);
+   //             }
+
+   //             Book bookA = _mapper.Map<Book>(bookDTO);
+   //             bookA.Id = BookShelf.bookList.OrderByDescending(b => b.Id).FirstOrDefault().Id + 1;
+   //             BookShelf.bookList.Add(bookA);
+
+   //             BookDTO bookDto = _mapper.Map<BookDTO>(bookA);
+
+   //             response.Result = bookDto;
+   //             response.IsSuccess = true;
+   //             response.Statuscode = System.Net.HttpStatusCode.Created;
+
+   //             return Results.Ok(response);
+   //             }).WithName("CreateBook").Produces<CreateBookDTO>(201).Accepts<APIResponse>("application/json").Produces(400);
 
             //Update book
             app.MapPut("/api/book", async (IMapper _mapper, IValidator<UpdateBookDTO> _validator, UpdateBookDTO book_U_DTO) =>
@@ -140,25 +138,25 @@ namespace Library_API
                 response.Statuscode = System.Net.HttpStatusCode.OK;
 			}).WithName("UpdateBook").Accepts<UpdateBookDTO>("application/json").Produces<UpdateBookDTO>(400);
 
-			app.MapDelete("/api/book/{id:int}", (int id) =>
-			{
-				APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
+			//app.MapDelete("/api/book/{id:int}", (int id) =>
+			//{
+			//	APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
 
-				Book bookShelf = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
+			//	Book bookShelf = BookShelf.bookList.FirstOrDefault(b => b.Id == id);
 
-				if (bookShelf != null)
-				{
-					BookShelf.bookList.Remove(bookShelf);
-					response.IsSuccess = true;
-					response.Statuscode = System.Net.HttpStatusCode.NoContent;
-					return Results.Ok(response);
-				}
-				else
-				{
-					response.ErrorMessages.Add("Invalid ID");
-					return Results.BadRequest(response);
-				}
-			}).WithName("DeleteBook");
+			//	if (bookShelf != null)
+			//	{
+			//		BookShelf.bookList.Remove(bookShelf);
+			//		response.IsSuccess = true;
+			//		response.Statuscode = System.Net.HttpStatusCode.NoContent;
+			//		return Results.Ok(response);
+			//	}
+			//	else
+			//	{
+			//		response.ErrorMessages.Add("Invalid ID");
+			//		return Results.BadRequest(response);
+			//	}
+			//}).WithName("DeleteBook");
 
 		    app.ConfigurationBookEndPoints();
 			app.Run();

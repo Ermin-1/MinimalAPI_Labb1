@@ -1,22 +1,154 @@
-html {
-  font-size: 14px;
+/* Reset CSS för konsekvens */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Kroppsinställningar för en ren och luftig design */
 body {
-  margin-bottom: 60px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #2c3e50;
+    background-color: #ecf0f1;
+    padding: 30px;
+}
+
+/* Rubrikstilar för tydlig hierarki och branding */
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 20px;
+    color: #34495e;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+h2 {
+    font-size: 2em;
+}
+
+h3 {
+    font-size: 1.75em;
+}
+
+/* Länkstilar med diskret men tydlig interaktiv feedback */
+a {
+    color: #2980b9;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+    a:hover {
+        color: #1abc9c;
+        border-bottom: 2px solid #1abc9c;
+    }
+
+/* Layoutcontainer med maxbredd och centrering */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Flexbox för en balanserad layout och bättre läsbarhet */
+.header, .footer {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.main-content {
+    background: white;
+    padding: 40px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.sidebar {
+    background: #f8f9fa;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-radius: 8px;
+}
+
+/* Flexbox layout för att hantera huvudinnehåll och sidofält */
+.content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Responsivt rutnät */
+@media (min-width: 768px) {
+    .main-content {
+        flex: 3;
+    }
+
+    .sidebar {
+        flex: 1;
+    }
+}
+
+/* Professionellt utseende för knappar med mjuka effekter */
+.button {
+    display: inline-block;
+    background: #1abc9c;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+    .button:hover {
+        background: #16a085;
+        transform: translateY(-2px);
+    }
+
+/* Elegant och minimalistisk footer */
+.footer {
+    font-size: 0.9em;
+    color: #bdc3c7;
+}
+
+/* Extra klass för textcentrering och skugga */
+.text-center {
+    text-align: center;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.rounded-lg {
+    border-radius: 10px;
+}
+
+/* Små detaljer för en lyxig känsla */
+.card {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 1.25em;
+    margin-bottom: 10px;
+    color: #34495e;
+}
+
+.card-text {
+    font-size: 1em;
+    color: #7f8c8d;
 }
