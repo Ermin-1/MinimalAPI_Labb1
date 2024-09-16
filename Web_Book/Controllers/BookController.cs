@@ -87,6 +87,7 @@ namespace Web_Book.Controllers
 					return RedirectToAction(nameof(BookIndex));
 				}
 			}
+
 			return View(model);
 		}
 

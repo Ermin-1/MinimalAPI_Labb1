@@ -15,7 +15,14 @@ namespace Web_Book
 
 			StaticDetails.BookApiBase = builder.Configuration["ServiceUrls:ErminBookAPI"];
 
-			var app = builder.Build();
+
+            builder.Services.AddCors((setup) => setup.AddPolicy("default", (options) =>
+            {
+                options.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+            }));
+
+
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

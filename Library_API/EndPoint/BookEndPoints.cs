@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Library_API.Models;
 using Library_API.Models.DTOs;
 using Library_API.Services;
@@ -14,7 +15,9 @@ namespace Library_API.EndPoint
             app.MapGet("/api/book/{id:int}", GetBook).WithDisplayName("GetBook").Produces<APIResponse>();
             app.MapPost("/api/book", CreateBook).WithName("CreateBook").Accepts<CreateBookDTO>("application/json").Produces(201).Produces(400);
             app.MapDelete("/api/book/{id:int}", DeleteBook).WithName("DeleteBook");
-		}
+            app.MapPut("/api/book", UpdateBook).WithName("UpdateBook").Accepts<UpdateBookDTO>("application/json").Produces<UpdateBookDTO>(200).Produces(400);
+
+        }
 
         public async static Task<IResult> GetAllBooks (IBookRepository bookRepository)
         {
@@ -82,5 +85,26 @@ namespace Library_API.EndPoint
                 return Results.NotFound(response);
             }
         }
-	}
+
+        public async static Task<IResult> UpdateBook(IBookRepository _bookRepo, IMapper _mapper, UpdateBookDTO bookUpdate)
+        {
+            APIResponse response = new() { IsSuccess = false, Statuscode = System.Net.HttpStatusCode.BadRequest };
+
+            // Mappa och uppdatera boken
+            await _bookRepo.UpdateAsync(_mapper.Map<Book>(bookUpdate));
+            await _bookRepo.SaveAsync();
+
+            // Returnera uppdaterad bok
+            response.Result = _mapper.Map<UpdateBookDTO>(await _bookRepo.GetAsync(bookUpdate.Id));
+            response.IsSuccess = true;
+            response.Statuscode = System.Net.HttpStatusCode.OK;
+
+            return Results.Ok(response);
+        }
+
+
+
+
+
+    }
 }
