@@ -11,9 +11,10 @@ import { CommonModule } from '@angular/common';
 //används för att transformera data som kommer från backend (t.ex. ta ut en specifik del av svaret).
 import { map } from 'rxjs/operators';
 
+//formatet för vad vi får från vår api-response i backend.
 interface APIResponse {
   isSuccess: boolean;
-  result: Book[]; // Hantera böcker här
+  result: Book[];
   statuscode: number;
   errorMessages: string[];
 }
@@ -32,7 +33,7 @@ interface APIResponse {
 export class AppComponent implements OnInit {
   books$!: Observable<Book[]>;  
   booksForm!: FormGroup;
-  selectedBookId: number | null = null; // Justera till number för att matcha backend
+  selectedBookId: number | null = null; 
 
   constructor(private http: HttpClient) {}
 
@@ -43,7 +44,7 @@ export class AppComponent implements OnInit {
       description: new FormControl(''),
       releaseDate: new FormControl(new Date()),
       genre: new FormControl(''),
-      isAvailable: new FormControl(false)
+      isAvalible: new FormControl(false)
     });
 
     this.books$ = this.getBooks(); // Hämta böcker från API
@@ -52,11 +53,16 @@ export class AppComponent implements OnInit {
   // Hämtar böcker genom GET API och mappar från APIResponse
   getBooks(): Observable<Book[]> {
     return this.http.get<APIResponse>('https://localhost:7121/api/books').pipe(
-      map(response => response.result) // Mappa till böckerna i "result"
+      map(response => {
+        console.log(response.result); // Logga svaret här för att kontrollera om IsAvalible är korrekt
+        return response.result;
+      })
     );
   }
+  
 
-  // Hantera formulärskickning: skapa ny bok eller uppdatera
+  // Hanterar formulärskickning: skapa ny bok eller uppdatera
+  //samlar in värden för att skapa ny eller updatera bok
   onFormSubmit() {
     const bookData = {
       title: this.booksForm.value.title,
@@ -64,26 +70,27 @@ export class AppComponent implements OnInit {
       description: this.booksForm.value.description,
       releaseDate: this.booksForm.value.releaseDate,
       genre: this.booksForm.value.genre,
-      isAvailable: this.booksForm.value.isAvailable
+      isAvalible: this.booksForm.value.isAvalible
     };
 
     if (this.selectedBookId) {
       // PUT - uppdatera en befintlig bok
       console.log('Uppdaterar bok med ID:', this.selectedBookId);
-      this.http.put<APIResponse>(`https://localhost:7121/api/book/${this.selectedBookId}`, { id: this.selectedBookId, ...bookData })
-        .subscribe({
-          next: (response) => {
-            if (response.isSuccess) {
-              console.log('Bok uppdaterad, svar från server:', response.result);
-              this.books$ = this.getBooks(); // Uppdatera listan efter ändring
-              this.booksForm.reset();  // Rensa formuläret
-              this.selectedBookId = null;  // Återställ vald bok-ID
-            } else {
-              console.error('Fel vid uppdatering:', response.errorMessages);
-            }
-          },
-          error: (err) => console.error('Error:', err)
-        });
+      this.http.put<APIResponse>('https://localhost:7121/api/book', { id: this.selectedBookId, ...bookData })
+      .subscribe({
+        next: (response) => {
+          if (response.isSuccess) {
+            console.log('Bok uppdaterad, svar från server:', response.result);
+            this.books$ = this.getBooks(); // Uppdatera listan efter ändring
+            this.booksForm.reset();  // Rensa formuläret
+            this.selectedBookId = null;  // Återställ vald bok-ID
+          } else {
+            console.error('Fel vid uppdatering:', response.errorMessages);
+          }
+        },
+        error: (err) => console.error('Error:', err)
+      });
+    
     } else {
       // POST - lägg till en ny bok
       console.log('Skapar ny bok');
@@ -106,16 +113,15 @@ export class AppComponent implements OnInit {
   onUpdateBook(book: Book) {
     this.selectedBookId = book.id; // Spara valt boks ID för uppdatering
   
-    // Formatdatum till "yyyy-MM-dd"
-    const formattedDate = new Date(book.releaseDate).toISOString().split('T')[0];
-  
-    this.booksForm.setValue({
+    const formattedDate = new Date(book.releaseDate).toISOString().split('T')[0]; // Formatera till yyyy-MM-dd
+
+    this.booksForm.patchValue({
       title: book.title,
       author: book.author,
       description: book.description,
       releaseDate: formattedDate,  // Använd formaterat datum här
       genre: book.genre,
-      isAvailable: book.isAvailable
+      isAvalible: book.isAvalible
     });
     console.log('Vald bok för uppdatering:', book); // Logga för kontroll
   }
@@ -147,5 +153,5 @@ interface Book {
   description: string;
   releaseDate: Date;
   genre: string;
-  isAvailable: boolean;
+  isAvalible: boolean;
 }
