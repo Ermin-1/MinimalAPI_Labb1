@@ -25,7 +25,6 @@ namespace Library_API
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
             builder.Services.AddScoped<IValidator<UpdateBookDTO>, BookUpdateValidation>();
 
-
             // Register repository interface
             builder.Services.AddScoped<IBookRepository, BookRepository>();
 
@@ -34,11 +33,10 @@ namespace Library_API
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Connection")));
 
             // Add CORS service
-            builder.Services.AddCors((setup) => setup.AddPolicy("default", (options) =>
+            builder.Services.AddCors((setup) => setup.AddPolicy("AllowAll", (options) =>
             {
                 options.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
             }));
-
 
             var app = builder.Build();  // Build the app
 

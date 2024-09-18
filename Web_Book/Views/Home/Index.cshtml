@@ -1,8 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome to Our Library";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to Our Library</h1>
+    <p class="lead">Explore a wide selection of books, discover new authors, and manage your book collection all in one place.</p>
+    <p>Here you can:</p>
+    <ul class="list-unstyled">
+        <li>📚 Browse and search for books</li>
+        <li>📝 Add new books to the collection</li>
+        <li>✏️ Edit and update book details</li>
+        <li>❌ Remove books from the library</li>
+    </ul>
+    <p>Start by visiting our <a asp-area="" asp-controller="Book" asp-action="BookIndex">Book Collection</a> and dive into the world of reading!</p>
 </div>

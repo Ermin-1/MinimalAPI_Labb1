@@ -1,0 +1,67 @@
+<div class="flex h-screen bg-gray-50">
+  <!-- Form Section -->
+  <div class="w-full lg:w-1/2 bg-white p-8 shadow-2xl rounded-xl m-4">
+    <form (ngSubmit)="onFormSubmit()" [formGroup]="booksForm">
+      <h1 class="pb-8 font-extrabold text-4xl text-gray-900 border-b border-gray-300">
+        {{ selectedBookId ? 'Update Book' : 'Add a New Book' }}
+      </h1>
+
+      <!-- Title Input -->
+      <div class="mt-6">
+        <label for="title" class="font-semibold text-gray-800 block">Book Title</label>
+        <input type="text" id="title" class="w-full p-4 mt-2 border rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 transition" formControlName="title" placeholder="Enter the book title">
+      </div>
+
+      <!-- Author Input -->
+      <div class="mt-6">
+        <label for="author" class="font-semibold text-gray-800 block">Author</label>
+        <input type="text" id="author" class="w-full p-4 mt-2 border rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 transition" formControlName="author" placeholder="Enter the author name">
+      </div>
+
+      <!-- Published Date Input -->
+      <div class="mt-6">
+        <label for="releaseDate" class="font-semibold text-gray-800 block">Published Date</label>
+        <input type="date" id="releaseDate" class="w-full p-4 mt-2 border rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 transition" formControlName="releaseDate">
+      </div>
+
+      <!-- Genre Input -->
+      <div class="mt-6">
+        <label for="genre" class="font-semibold text-gray-800 block">Genre</label>
+        <input type="text" id="genre" class="w-full p-4 mt-2 border rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-400 transition" formControlName="genre" placeholder="Enter the genre">
+      </div>
+
+      <!-- Submit Button -->
+      <div class="mt-8">
+        <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-400 transition font-semibold text-lg">
+          {{ selectedBookId ? 'Update Book' : 'Add Book' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Books List Section -->
+  <div class="w-full lg:w-1/2 overflow-auto p-8">
+    <ul *ngIf="books$ | async as books; else noBooks">
+      <li *ngFor="let item of books; trackBy: trackById" class="p-6 mb-6 bg-white shadow-lg rounded-xl border border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ item.title }}</h2>
+        <p class="text-gray-700 mb-1"><span class="font-medium">Author:</span> {{item.author}}</p>
+        <p class="text-gray-700 mb-1"><span class="font-medium">Published:</span> {{item.releaseDate | date}}</p>
+        <p class="text-gray-700 mb-1"><span class="font-medium">Genre:</span> {{item.genre}}</p>
+        <div class="mt-6 flex space-x-4">
+          <!-- Delete Button -->
+          <button class="bg-red-500 text-white py-3 px-6 rounded-lg hover:bg-red-600 focus:ring-4 focus:ring-red-400 transition font-medium" type="button" (click)="onDelete(item.id)">
+            Delete
+          </button>
+          <!-- Update Button -->
+          <button class="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-400 transition font-medium" type="button" (click)="onUpdateBook(item)">
+            Update
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <ng-template #noBooks>
+      <p class="text-center text-gray-500 font-semibold text-lg">No books found</p>
+    </ng-template>
+  </div>
+</div>
